@@ -29,10 +29,12 @@ import mt.filter.AnalyticsFilter;
  */
 public class MicroServer implements MicroTraderServer {
 	
+	//teste
+	
 	public static void main(String[] args) {
 		ServerComm serverComm = new AnalyticsFilter(new ServerCommImpl());
 		MicroTraderServer server = new MicroServer();
-		server.start(serverComm);
+		server.start(serverComm);		
 	}
 
 	public static final Logger LOGGER = Logger.getLogger(MicroServer.class.getName());
