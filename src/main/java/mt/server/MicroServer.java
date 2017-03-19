@@ -29,7 +29,7 @@ import mt.filter.AnalyticsFilter;
  */
 public class MicroServer implements MicroTraderServer {
 	
-	//teste
+	
 	
 	public static void main(String[] args) {
 		ServerComm serverComm = new AnalyticsFilter(new ServerCommImpl());
