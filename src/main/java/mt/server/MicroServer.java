@@ -27,12 +27,14 @@ import mt.filter.AnalyticsFilter;
  * @author Group 78
  *
  */
+/* commit de teste */
 public class MicroServer implements MicroTraderServer {
 	
 	public static void main(String[] args) {
 		ServerComm serverComm = new AnalyticsFilter(new ServerCommImpl());
 		MicroTraderServer server = new MicroServer();
 		server.start(serverComm);
+		System.out.println("xixi");
 	}
 
 	public static final Logger LOGGER = Logger.getLogger(MicroServer.class.getName());
