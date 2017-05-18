@@ -53,7 +53,7 @@ public class MicroServer implements MicroTraderServer {
 	public static void main(String[] args) {
 		ServerComm serverComm = new AnalyticsFilter(new ServerCommImpl());
 		MicroTraderServer server = new MicroServer();
-		server.start(serverComm);		
+		server.start(serverComm);
 	}
 
 	public static final Logger LOGGER = Logger.getLogger(MicroServer.class.getName());
@@ -80,6 +80,12 @@ public class MicroServer implements MicroTraderServer {
 
 	/** The value is {@value #EMPTY} */
 	public static final int EMPTY = 0;
+	
+	public enum Region{
+		EU, US, AS
+	}
+	
+	private Region region;
 
 	/**
 	 * Constructor
@@ -121,10 +127,10 @@ public class MicroServer implements MicroTraderServer {
 			case NEW_ORDER:
 				try {
 					verifyUserConnected(msg);
-//					if(msg.getOrder().getNumberOfUnits()<10){
-//						serverComm.sendError(msg.getSenderNickname(), "A single order quantity (buy or sell order) can never be lower than 10 units");
-//						break;
-//					}
+					if(msg.getOrder().getNumberOfUnits()<10){
+						serverComm.sendError(msg.getSenderNickname(), "A single order quantity (buy or sell order) can never be lower than 10 units");
+						break;
+					}
 					if(msg.getOrder().getServerOrderID() == EMPTY){
 						msg.getOrder().setServerOrderID(id++);
 					}
