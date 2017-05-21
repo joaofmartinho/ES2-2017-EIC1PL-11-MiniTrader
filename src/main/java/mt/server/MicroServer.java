@@ -127,10 +127,7 @@ public class MicroServer implements MicroTraderServer {
 			case NEW_ORDER:
 				try {
 					verifyUserConnected(msg);
-					if(msg.getOrder().getNumberOfUnits()<10){
-						serverComm.sendError(msg.getSenderNickname(), "A single order quantity (buy or sell order) can never be lower than 10 units");
-						break;
-					}
+					
 					if(msg.getOrder().getServerOrderID() == EMPTY){
 						msg.getOrder().setServerOrderID(id++);
 					}
@@ -422,12 +419,6 @@ public class MicroServer implements MicroTraderServer {
 			newElementOrder.setAttribute("Stock", stock);
 			newElementOrder.setAttribute("Units", units);
 			newElementOrder.setAttribute("Price", price);
-
-			// Create new element Customer
-			Element newElementCustomer = doc.createElement("Customer");
-
-			newElementCustomer.setTextContent(nickname); 
-			newElementOrder.appendChild(newElementCustomer);
 
 			// Add new node to XML document root element
 			System.out.println("----- Adding new element to root element -----");
