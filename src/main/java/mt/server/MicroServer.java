@@ -22,15 +22,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import mt.Order;
 import mt.comm.ServerComm;
@@ -47,8 +42,9 @@ import mt.filter.AnalyticsFilter;
  *
  */
 public class MicroServer implements MicroTraderServer {
-
-
+	
+	public static String BR2 = "Sellers cannot have more than five sell orders unfulfilled at any time";
+    public static String BR3 = "A single order quantity (buy or sell order) can never be lower than 10 units";
 
 	public static void main(String[] args) {
 		ServerComm serverComm = new AnalyticsFilter(new ServerCommImpl());
@@ -81,12 +77,6 @@ public class MicroServer implements MicroTraderServer {
 	/** The value is {@value #EMPTY} */
 	public static final int EMPTY = 0;
 	
-	public enum Region{
-		EU, US, AS
-	}
-	
-	private Region region;
-
 	/**
 	 * Constructor
 	 */
@@ -127,8 +117,12 @@ public class MicroServer implements MicroTraderServer {
 			case NEW_ORDER:
 				try {
 					verifyUserConnected(msg);
+					if(msg.getOrder().isSellOrder() && getUnfulfilledOrders(msg.getOrder().getNickname())>=5){
+			            serverComm.sendError(msg.getOrder().getNickname(), BR2);
+			            break;
+			        }
 					if(msg.getOrder().getNumberOfUnits()<10){
-						serverComm.sendError(msg.getSenderNickname(), "A single order quantity (buy or sell order) can never be lower than 10 units");
+						serverComm.sendError(msg.getSenderNickname(), BR3);
 						break;
 					}
 					if(msg.getOrder().getServerOrderID() == EMPTY){
@@ -415,18 +409,11 @@ public class MicroServer implements MicroTraderServer {
 			String stock=o.getStock();
 			String units=Integer.toString(o.getNumberOfUnits());
 			String price=Double.toString(o.getPricePerUnit());
-			String nickname=o.getNickname();
 			newElementOrder.setAttribute("Id", id);
 			newElementOrder.setAttribute("Type", type);
 			newElementOrder.setAttribute("Stock", stock);
 			newElementOrder.setAttribute("Units", units);
 			newElementOrder.setAttribute("Price", price);
-
-			// Create new element Customer
-			Element newElementCustomer = doc.createElement("Customer");
-
-			newElementCustomer.setTextContent(nickname); 
-			newElementOrder.appendChild(newElementCustomer);
 
 			// Add new node to XML document root element
 			System.out.println("----- Adding new element to root element -----");
@@ -443,6 +430,16 @@ public class MicroServer implements MicroTraderServer {
 			transformer.transform(source, result);
 		} catch (Exception e) { e.printStackTrace(); }
 	}
+	
+	private int getUnfulfilledOrders(String nickname){
+        Set<Order> clientOrders=orderMap.get(nickname);
+        int counter=0;
+        for (Order order : clientOrders) {
+            if(order.isSellOrder()){
+                counter++;
+            }
+        }
+        return counter;
+    }
+	
 }
-
-
