@@ -48,7 +48,11 @@ import mt.filter.AnalyticsFilter;
  */
 public class MicroServer implements MicroTraderServer {
 
+	public static String BR1 = "Clients are not allowed to issue sell orders for their own buy orders and vice versa";
 
+	public static String BR2 = "Sellers cannot have more than five sell orders unfulfilled at any time";
+
+	public static String BR3 = "A single order quantity (buy or sell order) can never be lower than 10 units";
 
 	public static void main(String[] args) {
 		ServerComm serverComm = new AnalyticsFilter(new ServerCommImpl());
@@ -80,12 +84,6 @@ public class MicroServer implements MicroTraderServer {
 
 	/** The value is {@value #EMPTY} */
 	public static final int EMPTY = 0;
-	
-	public enum Region{
-		EU, US, AS
-	}
-	
-	private Region region;
 
 	/**
 	 * Constructor
@@ -128,7 +126,15 @@ public class MicroServer implements MicroTraderServer {
 				try {
 					verifyUserConnected(msg);
 					if(msg.getOrder().getNumberOfUnits()<10){
-						serverComm.sendError(msg.getSenderNickname(), "A single order quantity (buy or sell order) can never be lower than 10 units");
+						serverComm.sendError(msg.getSenderNickname(), BR3);
+						break;
+					}
+					if(getUnfulfilledOrders(msg.getOrder().getNickname()) >= 5){
+						serverComm.sendError(msg.getOrder().getNickname(), BR2);
+						break;
+					}
+					if (!validOrder(msg.getOrder())){
+						serverComm.sendError(msg.getOrder().getNickname(), BR1);
 						break;
 					}
 					if(msg.getOrder().getServerOrderID() == EMPTY){
@@ -163,8 +169,9 @@ public class MicroServer implements MicroTraderServer {
 			}
 		}
 		throw new ServerException("The user " + msg.getSenderNickname() + " is not connected.");
-
 	}
+
+
 
 	/**
 	 * Process the user connection
@@ -324,7 +331,6 @@ public class MicroServer implements MicroTraderServer {
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -426,7 +432,7 @@ public class MicroServer implements MicroTraderServer {
 			// Create new element Customer
 			Element newElementCustomer = doc.createElement("Customer");
 
-			newElementCustomer.setTextContent(nickname); 
+			newElementCustomer.setTextContent(nickname);
 			newElementOrder.appendChild(newElementCustomer);
 
 			// Add new node to XML document root element
@@ -443,6 +449,29 @@ public class MicroServer implements MicroTraderServer {
 			DOMSource source = new DOMSource(doc);
 			transformer.transform(source, result);
 		} catch (Exception e) { e.printStackTrace(); }
+	}
+
+	//Method for constraint: Sellers cannot have more than five sell orders unfulfilled at any time
+	private int getUnfulfilledOrders(String nickname){
+		Set<Order> clientOrders=orderMap.get(nickname);
+		int counter=0;
+		for (Order order : clientOrders) {
+			if(order.isSellOrder()){
+				counter++;
+			}
+		}
+		return counter;
+	}
+
+	// Method for constraint: Clients are not allowed to issue sell orders for their own buy orders and vice versa
+	private boolean validOrder(Order o) {
+		Set<Order> clientOrders=orderMap.get(o.getNickname());
+		for (Order order : clientOrders) {
+			if(o.getStock().equals(order.getStock()) && (o.isBuyOrder()^order.isBuyOrder())){
+				return false;
+			}
+		}
+		return true;
 	}
 }
 

@@ -14,6 +14,7 @@ import mt.comm.ClientSideMessage;
 import mt.comm.ClientSideMessage.Type;
 import mt.comm.ServerSideMessage;
 import mt.comm.common.CommUtils;
+import mt.server.MicroServer;
 
 /**
  * This class is responsible for handling sockets and streams between the server
@@ -251,7 +252,7 @@ class ClientCommThread extends Thread {
 					ClientSideMessage message = (ClientSideMessage) in.readObject();
 					System.out.println(String.format("ClientComm >> Client '%s' is processing %s", nickname, message));
 					clientMessages.put(message);
-					if(Type.ERROR.equals(message.getType()) && message.getError() != "A single order quantity (buy or sell order) can never be lower than 10 units"){
+					if(Type.ERROR.equals(message.getType()) && (message.getError() != MicroServer.BR2 || message.getError() != MicroServer.BR3 || message.getError() != MicroServer.BR1)){
 						System.out.println(String.format("ClientComm >> Client '%s' was not allowed to connect", nickname, message));
 						isConnected = false;
 					}
