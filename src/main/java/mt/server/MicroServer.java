@@ -259,7 +259,7 @@ public class MicroServer implements MicroTraderServer {
 
 		// save the order on map
 		saveOrder(o);
-		saveOnXML(o);
+
 		// if is buy order
 		if (o.isBuyOrder()) {
 			processBuy(msg.getOrder());
@@ -403,54 +403,7 @@ public class MicroServer implements MicroTraderServer {
 			}
 		}
 	}
-	private void saveOnXML(Order o) {
-		try{
-			// TODO Auto-generated method stub
-			File inputFile = new File("MicroTraderPersistence.xml");
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(inputFile);
-			doc.getDocumentElement().normalize();                  
-			// Create new element Order with attributes
-			Element newElementOrder = doc.createElement("Order");
-			String id=Integer.toString(o.getServerOrderID());
-			String type="";
-			if(o.isBuyOrder())
-				type="Buy";
-			else
-				type="Sell";
-			String stock=o.getStock();
-			String units=Integer.toString(o.getNumberOfUnits());
-			String price=Double.toString(o.getPricePerUnit());
-			String nickname=o.getNickname();
-			newElementOrder.setAttribute("Id", id);
-			newElementOrder.setAttribute("Type", type);
-			newElementOrder.setAttribute("Stock", stock);
-			newElementOrder.setAttribute("Units", units);
-			newElementOrder.setAttribute("Price", price);
-
-			// Create new element Customer
-			Element newElementCustomer = doc.createElement("Customer");
-
-			newElementCustomer.setTextContent(nickname);
-			newElementOrder.appendChild(newElementCustomer);
-
-			// Add new node to XML document root element
-			System.out.println("----- Adding new element to root element -----");
-			System.out.println("Root element :" + doc.getDocumentElement().getNodeName());         
-			System.out.println("Add Order Id="+id+" Type="+type+" Stock="+stock+" Units="+units+" Price="+price);
-			Node n = doc.getDocumentElement();
-			n.appendChild(newElementOrder);
-			// Save XML document
-			System.out.println("Save XML document.");
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult result = new StreamResult(new FileOutputStream("MicroTraderPersistence.xml"));
-			DOMSource source = new DOMSource(doc);
-			transformer.transform(source, result);
-		} catch (Exception e) { e.printStackTrace(); }
-	}
-
+	
 	//Method for constraint: Sellers cannot have more than five sell orders unfulfilled at any time
 	private int getUnfulfilledOrders(String nickname){
 		Set<Order> clientOrders=orderMap.get(nickname);
@@ -467,7 +420,7 @@ public class MicroServer implements MicroTraderServer {
 	private boolean validOrder(Order o) {
 		Set<Order> clientOrders=orderMap.get(o.getNickname());
 		for (Order order : clientOrders) {
-			if(o.getStock().equals(order.getStock()) && (o.isBuyOrder()^order.isBuyOrder())){
+			if(o.getStock().equals(order.getStock()) &&(o.isBuyOrder()^order.isBuyOrder())){
 				return false;
 			}
 		}
