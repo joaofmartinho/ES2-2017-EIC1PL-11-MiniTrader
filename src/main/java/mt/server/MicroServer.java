@@ -399,7 +399,6 @@ public class MicroServer implements MicroTraderServer {
 	}
 	private void saveOnXML(Order o) {
 		try{
-			// TODO Auto-generated method stub
 			File inputFile = new File("MicroTraderPersistence.xml");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
