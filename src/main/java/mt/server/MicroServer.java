@@ -403,7 +403,6 @@ public class MicroServer implements MicroTraderServer {
 			}
 		}
 	}
-	
 	//Method for constraint: Sellers cannot have more than five sell orders unfulfilled at any time
 	private int getUnfulfilledOrders(String nickname){
 		Set<Order> clientOrders=orderMap.get(nickname);
