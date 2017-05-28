@@ -5,7 +5,7 @@ vídeo URL - https://www.youtube.com/watch?v=z8D5iDqsIrI&feature=youtu.be
 EIC1-PL, grupo 11
 
 Vídeo EU - https://www.youtube.com/watch?v=3D57cTVz__A&feature=youtu.be
-Vídeo AS - https://www.youtube.com/watch?v=QmQ62xrgylk&feature=youtu.be
+Vídeo AS - https://youtu.be/V-EQnARHA9c (Corrigido)
 Vídeo US - https://www.youtube.com/watch?v=y-JohA2UNr4&feature=youtu.be
 
 Trabalho Completo.
