@@ -419,7 +419,10 @@ public class MicroServer implements MicroTraderServer {
 			newElementOrder.setAttribute("Stock", stock);
 			newElementOrder.setAttribute("Units", units);
 			newElementOrder.setAttribute("Price", price);
+			Element newElementCustomer = doc.createElement("Customer");
 
+	         newElementCustomer.setTextContent(nickname); 
+	         newElementOrder.appendChild(newElementCustomer);
 			// Add new node to XML document root element
 			System.out.println("----- Adding new element to root element -----");
 			System.out.println("Root element :" + doc.getDocumentElement().getNodeName());         
